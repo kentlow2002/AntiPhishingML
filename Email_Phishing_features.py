@@ -4,7 +4,7 @@ from spellchecker import SpellChecker
 from textblob import TextBlob
 
 # Load email data
-df = pd.read_csv('mini_enron_data_fraud_labeled.csv', low_memory=False)
+df = pd.read_csv('enron_data_fraud_labeled.csv', low_memory=False)
 
 # Remove any unnamed columns
 df = df.loc[:, ~df.columns.str.contains('^Unnamed')]
