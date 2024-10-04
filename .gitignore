@@ -1,3 +1,7 @@
+#databases
+*.csv
+*.zip
+
 # Visual Studio
 .vs/
 
@@ -28,6 +32,7 @@ share/python-wheels/
 .installed.cfg
 *.egg
 MANIFEST
+pyvenv.cfg
 
 # PyInstaller
 #  Usually these files are written by a python script from a template
@@ -163,3 +168,4 @@ cython_debug/
 #  and can be added to the global gitignore or merged into this file.  For a more nuclear
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 #.idea/
+/Screenshot 2024-09-30 224832.jpg
