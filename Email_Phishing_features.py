@@ -16,7 +16,7 @@ nltk.download('stopwords')
 stop_words = set(stopwords.words('english'))
 
 # Load the email data
-df = pd.read_csv('enron_data_fraud_labeled.csv', low_memory=False)
+df = pd.read_csv('clean_enron.csv')
 
 # Remove any unnamed columns
 df = df.loc[:, ~df.columns.str.contains('^Unnamed')]
