@@ -26,18 +26,12 @@
             <h2>About</h2>
             <p>We will...</p>
         </section>
-        <div class="container">
-            <label for="userInput">Enter something:</label>
-            <input type="text" id="userInput" name="userInput">
-            <button onclick="handleClick()">Submit</button>
-        </div>
-    
-        <script>
-            function handleClick() {
-                const input = document.getElementById('userInput').value;
-                alert('You entered: ' + input);
-            }
-        </script>
+        <form action="/submit" method="POST">
+            <label for="name">Enter your email here:</label>
+            <input type="text" id="email" name="email" required>
+            <br><br>
+            <input type="submit" value="Submit">
+        </form>
     </main>
     <footer>
         <p>&copy; 2024 INF 1002 Freestyle Group</p>
