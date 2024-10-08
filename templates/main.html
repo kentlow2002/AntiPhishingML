@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Basic Website</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <h1>Welcome to AntiPhishingML</h1>
+    </header>
+    <nav>
+        <ul>
+            <li><a href="#home">Home</a></li>
+            <li><a href="#about">About</a></li>
+            <li><a href="#main">AntiPhish</a></li>
+        </ul>
+    </nav>
+    <main>
+        <section id="home">
+            <h2>AntiPhishing</h2>
+            <p>Welcome to our classification model.</p>
+        </section>
+        <section id="about">
+            <h2>About</h2>
+            <p>We will...</p>
+        </section>
+        <div class="container">
+            <label for="userInput">Enter something:</label>
+            <input type="text" id="userInput" name="userInput">
+            <button onclick="handleClick()">Submit</button>
+        </div>
+    
+        <script>
+            function handleClick() {
+                const input = document.getElementById('userInput').value;
+                alert('You entered: ' + input);
+            }
+        </script>
+    </main>
+    <footer>
+        <p>&copy; 2024 INF 1002 Freestyle Group</p>
+    </footer>
+</body>
+</html>

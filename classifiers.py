@@ -53,82 +53,37 @@ def randomForestClassifier(X_train, X_test, y_train):
 def rfcSearch(X_train, X_test, y_train):
     #n_estimators is number of trees, max_features is number of features, max_depth is max depth per tree
     parameters = {
-        'n_estimators': [100, 500, 1000],
         }
-    scoring = {'f1-score':'f1'}
+    scoring = {'precision':'precision'}
     pipe = Pipeline(
         [
             ('scaling', MaxAbsScaler()),
             ('classify', GridSearchCV(
                 RandomForestClassifier(
+                    n_estimators=100,
                     random_state=42,
-                    max_depth=20,
                     max_features='sqrt',
-                    class_weight="balanced"
+                    max_depth=50,
+                    class_weight={0: 1, 1: 3},
                 ), 
                 param_grid=parameters, 
                 n_jobs=-1, 
                 scoring=scoring, 
-                refit='f1-score'))
+                refit='precision'))
         ]
     )
     pipe.fit(X_train, y_train)
-    results = pipe['classify'].cv_results_
-    plt.figure(figsize=(13, 13))
-    plt.title("GridSearchCV evaluation", fontsize=16)
 
-    plt.xlabel("n_estimators")
-    plt.ylabel("F1 Score")
-
-    ax = plt.gca()
-    ax.set_xlim(100, 350)
-    ax.set_ylim(0.00, 1)
-
-    # Get the regular numpy array from the MaskedArray
-    X_axis = np.array(results["param_n_estimators"].data, dtype=float)
-
-    for scorer, color in zip(sorted(scoring), ["g", "k"]):
-        for sample, style in (("test", "-"),):
-            sample_score_mean = results["mean_%s_%s" % (sample, scorer)]
-            sample_score_std = results["std_%s_%s" % (sample, scorer)]
-            ax.plot(
-                X_axis,
-                sample_score_mean,
-                style,
-                color=color,
-                alpha=1 if sample == "test" else 0.7,
-                label="%s (%s)" % (scorer, sample),
-            )
-
-        best_index = np.nonzero(results["rank_test_%s" % scorer] == 1)[0][0]
-        best_score = results["mean_test_%s" % scorer][best_index]
-
-        # Plot a dotted vertical line at the best score for that scorer marked by x
-        ax.plot(
-            [
-                X_axis[best_index],
-            ]
-            * 2,
-            [0, best_score],
-            linestyle="-.",
-            color=color,
-            marker="x",
-            markeredgewidth=3,
-            ms=8,
-        )
-
-        # Annotate the best score for that scorer
-        ax.annotate("%0.2f" % best_score, (X_axis[best_index], best_score + 0.005))
-
-    plt.legend(loc="best")
-    plt.grid(False)
-    plt.show()
+    print(pipe['classify'].best_params_)
+    y_pred = pipe.predict(X_test)
+    return y_pred
 
 # i have no clue what im doing bruh
 
 if __name__ == '__main__':
     X_train, X_test, y_train, y_test = generate_split_data(r".\emails_with_features.csv", test_pct=0.20)
-    rfcSearch(X_train, X_test, y_train.squeeze())
+    predictions = rfcSearch(X_train, X_test, y_train.squeeze())
+    print(classification_report(y_test, predictions))
     '''precision, recall, _ = precision_recall_curve(y_test, predictions)
     print(precision, recall)
     print(classification_report(y_test, predictions))'''

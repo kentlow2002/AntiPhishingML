@@ -3,7 +3,7 @@ from sklearn.feature_extraction.text import HashingVectorizer, CountVectorizer
 from sklearn.model_selection import train_test_split
 import numpy as np
 from scipy.sparse import hstack
-from pickle import load
+from pickle import load, dump
 
 # Function to load data from CSV, perform TF-IDF, and split training and testing data
 def generate_split_data(csv_file, test_pct=0.40, head=0):
@@ -18,7 +18,10 @@ def generate_split_data(csv_file, test_pct=0.40, head=0):
     with open('count_vectorizer.pkl', 'rb') as f:
         count_vectorizer = load(f)
 
-    hash_vectorizer = HashingVectorizer(n_features=2**3)
+    with open('hash_vectorizer.pkl', 'rb') as f:
+        hash_vectorizer = load(f)
+
+    #hash_vectorizer = HashingVectorizer(n_features=2**3)
 
     #split dataset into test and training
     X_train, X_test, y_train, y_test = train_test_split(dataset[['Body', 'Sentiment', 'Sender_Domain']], dataset[['Label']], test_size=test_pct, random_state=42, shuffle=True)
@@ -27,6 +30,7 @@ def generate_split_data(csv_file, test_pct=0.40, head=0):
     #lambda used here ensures all values become string, including empty values e.g. np.NaN, which will throw error in vectorizer
     X_train_vect = count_vectorizer.transform(X_train.Body)
     X_train_sender_vect = hash_vectorizer.fit_transform(X_train.Sender_Domain.apply(lambda x: np.str_(x)))
+    
     X_test_vect = count_vectorizer.transform(X_test.Body)
     X_test_sender_vect = hash_vectorizer.transform(X_test.Sender_Domain.apply(lambda x: np.str_(x)))
 
