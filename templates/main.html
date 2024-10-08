@@ -27,9 +27,12 @@
             <p>We will...</p>
         </section>
         <form action="/submit" method="POST">
-            <label for="name">Enter your email here:</label>
-            <input type="text" id="email" name="email" required>
-            <br><br>
+            <label for="name">Enter sender email address domain here:</label>
+            <input type="text" id="sender-domain" name="sender-domain" required />
+            <br />
+            <label for="name">Enter email content here:</label>
+            <textarea type="text" id="email-body" name="email-body" required></textarea>
+            <br />
             <input type="submit" value="Submit">
         </form>
     </main>

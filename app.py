@@ -1,4 +1,5 @@
 from flask import Flask, render_template, request
+from model import tester
 
 app = Flask(__name__)
 
@@ -8,9 +9,11 @@ def index():
 
 @app.route('/submit', methods=['POST'])
 def submit():
-    name = request.form['email']
+    email_body = request.form['email-body']
+    sender_domain = request.form['sender-domain']
     # Pass the user input to the result template
-    return render_template('result.html', email=name)
+    prediction = tester(email_body, sender_domain)
+    return render_template('result.html', email=prediction)
 
 if __name__ == '__main__':
     app.run(debug=True)

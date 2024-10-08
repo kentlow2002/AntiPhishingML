@@ -24,7 +24,7 @@ def generate_split_data(csv_file, test_pct=0.40, head=0):
     #hash_vectorizer = HashingVectorizer(n_features=2**3)
 
     #split dataset into test and training
-    X_train, X_test, y_train, y_test = train_test_split(dataset[['Body', 'Sentiment', 'Sender_Domain']], dataset[['Label']], test_size=test_pct, random_state=42, shuffle=True)
+    X_train, X_test, y_train, y_test = train_test_split(dataset[['Body', 'Sentiment', 'Sender_Domain']], dataset[['Label']], test_size=test_pct, shuffle=True)
     
     #transform text features into word counts/hashes with vectorizer
     #lambda used here ensures all values become string, including empty values e.g. np.NaN, which will throw error in vectorizer
