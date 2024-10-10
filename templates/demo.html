@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% block title %} Demo {% endblock %}
+
+{% block content %}
+<section id="features" class="section">
+    <h2>Begin here:</h2>
+    <h3>Enter the sender's email address and content below and let our model do the rest of the work</h3>
+    <div class="features-grid">
+        <div class="feature-card">
+            <form action="/submit" method="POST">
+                <label for="name">Enter sender email address domain here:</label>
+                <input type="text" id="sender-domain" name="sender-domain" required />
+                <br />
+                <label for="name">Enter email content here:</label>
+                <textarea type="text" id="email-body" name="email-body" required></textarea>
+                <br />
+                <input type="submit" value="Submit">
+            </form>
+        </div>
+    </div>
+</section>
+{% endblock %}
+    <section id="contact" class="section">
+        <h2>Contact Us</h2>
+        <p>Have questions? Reach out to our support team for help.</p>
+    </section>
+    <footer>
+        <p>&copy; 2024 INF 1002 Freestyle Group</p>
+    </footer>
+</body>
+</html>

@@ -8,7 +8,7 @@ from sklearn.preprocessing import LabelEncoder
 
 # Load the dataset (you can replace this with the actual path of your dataset)
 # Assuming the dataset is in CSV format and has features like 'Sender_Info', 'Content', 'Links', etc.
-df = pd.read_csv("C:\School\SIT\INF1002\Project\emails_with_features.csv")
+df = pd.read_csv("emails_with_features.csv")
 
 # Check the first few rows of the dataset
 print(df.head())

@@ -8,7 +8,7 @@ from faker import Faker  # To generate random email addresses and dates
 fake = Faker()
 
 # Define the folder paths
-archive_folder = r"C:\PhishingEmail\spam"
+archive_folder = r".\spam_assassin_corpus"
 subfolders = ["easy_ham", "hard_ham", "spam_2"]
 
 # Regex patterns for extracting fields
@@ -125,12 +125,20 @@ for folder in subfolders:
 
 # Convert to DataFrame
 df = pd.DataFrame(all_emails)
-
+print(df.columns)
 # Fill missing categorical values with random data, including Message-ID
 df_filled = fill_missing_with_random(df)
 
 # Filter rows based on whether Message-ID contains an '@' symbol
 df_filtered_message_id = df_filled[df_filled['Message-ID'].str.contains("@", na=False)]
+
+if 'Label' in df.columns:
+    #filter labels that are not 0/1. rows filtered away are considered corrupted
+    df_filtered_message_id = df_filtered_message_id.loc[df_filtered_message_id['Label'].isin([0, 1])]
+    print(df_filtered_message_id['Label'].unique())
+    #df.to_csv(output_file, index=False)
+else:
+    print("No rows to remove.")
 
 # Write the filtered data (based on Message-ID) to CSV
 df_filtered_message_id.to_csv('clean_spam.csv', index=False)

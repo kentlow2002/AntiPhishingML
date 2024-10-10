@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static',filename='styles/styles.css') }}">
+    <title>{% block title %}{% endblock %} - AntiPhishingML</title>
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <h1>AntiPhishingML</h1>
+        </div>
+        <nav>
+            <ul>
+                <li><a href="/">Home</a></li>
+                <li><a href="Demo">AntiPhish</a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+    <section id="contact" class="section">
+        <h2>Contact Us</h2>
+        <p>Have questions? Reach out to our support team for help.</p>
+    </section>
+    <footer>
+        <p>&copy; 2024 INF 1002 Freestyle Group</p>
+    </footer>
+</body>
+</html>

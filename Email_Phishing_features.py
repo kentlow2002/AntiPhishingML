@@ -10,6 +10,8 @@ from wordcloud import WordCloud
 from sklearn.feature_extraction.text import CountVectorizer
 import nltk
 from nltk.corpus import stopwords
+from distutils.command import clean
+from os.path import isfile
 
 
 # Define lists for suspicious domains and TLDs
@@ -22,11 +24,14 @@ suspicious_domain_pattern = r'\d+|[-]{2,}'
 nltk.download('stopwords')
 stop_words = set(stopwords.words('english'))
 
+# Initialize spell checker
+spell = SpellChecker()
+
 
 def feature_extraction(filename):
 
     # Load the email data
-    df = pd.read_csv('clean_enron.csv')
+    df = pd.read_csv(filename)
 
     # Remove any unnamed columns
     df = df.loc[:, ~df.columns.str.contains('^Unnamed')]
@@ -76,7 +81,11 @@ def feature_extraction(filename):
     df.fillna({'Body': '', 'Subject': 'No Subject'}, inplace=True)
 
     # Save the feature-engineered dataset to a new CSV file
-    df.to_csv('emails_with_features.csv', index=False)
+    # if the file already exists (with content), dont put column header into file again
+    if not isfile('emails_with_features.csv'):
+        df.to_csv('emails_with_features.csv', index=False, mode='a')
+    else:
+        df.to_csv('emails_with_features.csv', index=False, header=False, mode='a')
 
     # Display the first few rows of the dataset
     print(df.head())
@@ -89,7 +98,7 @@ def feature_extraction(filename):
 
     cleaned_spam_texts = preprocess_text(spam_texts)
 
-    return cleaned_spam_texts
+    return cleaned_spam_texts+" "
 
 # Function to check if the domain contains suspicious patterns
 def is_suspicious_domain(domain):
@@ -113,7 +122,6 @@ def is_typo_domain(domain, known_legit_domains):
 
 def count_misspelled_words(text):
     # 6. Count misspelled words using SpellChecker
-    spell = SpellChecker()
     text_cleaned = re.sub(r'[^\w\s]', '', text)
     words = text_cleaned.split()
     misspelled = spell.unknown(words)
@@ -165,11 +173,9 @@ def wordcloud_generate(cleaned_spam_texts):
 
 
 if __name__ == '__main__':
-    datasets = ['clean_enron.csv', 'clean_spamassassin.csv']
-    cleaned_texts = []
+    datasets = ['clean_enron.csv', 'clean_spam.csv']
+    texts = ""
     for i in datasets:
-        cleaned_texts.append(feature_extraction(i))
+        texts += feature_extraction(i)
 
-    for texts in cleaned_texts:
-        wordcloud_generate(cleaned_texts)
-
+    wordcloud_generate(texts)
