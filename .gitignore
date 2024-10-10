@@ -172,3 +172,8 @@ cython_debug/
 *.pkl
 vocab.txt
 /python
+/randomForestClassifier{max_depth30}
+/randomForestClassifier{max_depth10,n_estimators1000}
+/randomForestClassifier{class_weight{01,12},max_depth20,n_estimators100}precision
+/randomForestClassifier{class_weightbalanced,n_estimators1000}
+/randomForestClassifier{class_weight{01,12},max_depth20,n_estimators100}precision
