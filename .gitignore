@@ -177,3 +177,4 @@ vocab.txt
 /randomForestClassifier{class_weight{01,12},max_depth20,n_estimators100}precision
 /randomForestClassifier{class_weightbalanced,n_estimators1000}
 /randomForestClassifier{class_weight{01,12},max_depth20,n_estimators100}precision
+/spam_assassin_corpus
