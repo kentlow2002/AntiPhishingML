@@ -1,7 +1,11 @@
 import os
 import re
 import pandas as pd
-from sklearn.impute import KNNImputer
+import numpy as np
+from faker import Faker  # To generate random email addresses and dates
+
+# Initialize Faker instance for generating random data
+fake = Faker()
 
 # Define the folder paths
 archive_folder = r"C:\PhishingEmail\spam"
@@ -40,9 +44,17 @@ def extract_email_fields(file_content):
     # Process each line to extract header fields and body
     for line in file_content.splitlines():
         if not in_body:
-            # Try to match headers
+            # Extract Date from the content
+            if line.lower().startswith("date:"):
+                date_match = patterns['Date'].match(line)
+                if date_match:
+                    email_data['Date'] = date_match.group(1)
+
+            # Extract other headers
             header_found = False
             for field, pattern in patterns.items():
+                if field == 'Date':
+                    continue  # Skip Date since it's already handled
                 match = pattern.match(line)
                 if match:
                     email_data[field] = match.group(1)
@@ -65,6 +77,23 @@ def get_label(folder_name):
         return 1  # Spam
     else:
         return 0  # Ham
+
+# Fill missing values with random data
+def fill_missing_with_random(df):
+    for col in df.columns:
+        if col == 'Message-ID':
+            # Replace missing Message-ID with random message IDs
+            df[col] = df[col].apply(lambda x: f"<{fake.uuid4()}@{fake.domain_name()}>" if pd.isna(x) else x)
+        elif col == 'Date':
+            # Replace missing dates with random dates
+            df[col] = df[col].apply(lambda x: fake.date_time_this_decade() if pd.isna(x) else x)
+        elif col in ['From', 'To', 'Mail-ID']:
+            # Replace missing email addresses with random emails
+            df[col] = df[col].apply(lambda x: fake.email() if pd.isna(x) else x)
+        elif col == 'Sender-Type':
+            # Replace missing Sender-Type with random choice between 'External' and 'Internal'
+            df[col] = df[col].apply(lambda x: fake.random_element(elements=('External', 'Internal')) if pd.isna(x) else x)
+    return df
 
 # List to hold all extracted data
 all_emails = []
@@ -92,41 +121,16 @@ for folder in subfolders:
                 email_data['Mail-ID'] = filename  # Use filename as Mail-ID
                 email_data['Sender-Type'] = "External"  # Example, adjust as needed
                 email_data['Label'] = get_label(folder)  # Label based on folder
-                
                 all_emails.append(email_data)
 
 # Convert to DataFrame
 df = pd.DataFrame(all_emails)
 
-# Remove rows where only "Message-ID" is present and all other fields are missing
-df_cleaned = df.dropna(subset=[col for col in df.columns if col != 'Message-ID'], how='all')
+# Fill missing categorical values with random data, including Message-ID
+df_filled = fill_missing_with_random(df)
 
-# Set missing values in the "Body" column to NaN (if not already NaN)
-df_cleaned['Body'] = df_cleaned['Body'].fillna(pd.NA)
+# Filter rows based on whether Message-ID contains an '@' symbol
+df_filtered_message_id = df_filled[df_filled['Message-ID'].str.contains("@", na=False)]
 
-# Fill missing values in text columns using mode (most common value) - Exclude 'Message-ID' and 'Subject'
-impute_columns = ['Date', 'From', 'To', 'Mail-ID', 'Sender-Type']
-for column in impute_columns:
-    df_cleaned[column] = df_cleaned[column].fillna(df_cleaned[column].mode()[0])  # Fill missing with mode
-
-# "Message-ID" and "Subject" columns are left unchanged, no imputation or KNN is applied to them
-
-# Select only the numerical columns for KNN imputation
-numerical_columns = ['Unique-Mails-From-Sender']
-df_numerical = df_cleaned[numerical_columns]
-
-# Apply KNN imputation on numerical columns only
-imputer = KNNImputer(n_neighbors=3)
-df_numerical_imputed = pd.DataFrame(imputer.fit_transform(df_numerical), columns=df_numerical.columns)
-
-# Replace the imputed numerical columns in the original DataFrame
-df_cleaned[numerical_columns] = df_numerical_imputed
-
-# Shift all data up to remove gaps using the stack/unstack method
-df_shifted = df_cleaned.stack().unstack().reset_index(drop=True)
-
-# Remove any rows that still have missing data after shifting
-df_shifted.dropna(inplace=True)
-
-# Write the final cleaned DataFrame to a CSV file
-df_shifted.to_csv('clean_spam.csv', index=False)
+# Write the filtered data (based on Message-ID) to CSV
+df_filtered_message_id.to_csv('clean_spam.csv', index=False)
