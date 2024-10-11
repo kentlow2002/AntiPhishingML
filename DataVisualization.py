@@ -39,7 +39,7 @@ plt.show()
 
 # Explore categorical features (e.g., Sender_Info, Domain, etc.)
 plt.figure(figsize=(10, 6))
-sns.countplot(y='Sender_Info', data=df, order=df['Sender_Info'].value_counts().index, palette='coolwarm')
+sns.countplot(y='Sender_Domain', data=df, order=df['Sender_Domain'].value_counts().index, palette='coolwarm')
 plt.title('Sender Information Frequency')
 plt.show()
 

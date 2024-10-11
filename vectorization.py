@@ -24,7 +24,7 @@ def generate_split_data(csv_file, test_pct=0.40, head=0):
     #hash_vectorizer = HashingVectorizer(n_features=2**3)
 
     #split dataset into test and training
-    X_train, X_test, y_train, y_test = train_test_split(dataset[['Body', 'Sentiment', 'Sender_Domain']], dataset[['Label']], test_size=test_pct, shuffle=True)
+    X_train, X_test, y_train, y_test = train_test_split(dataset[['Body', 'Sentiment', 'Sender_Domain', 'Caps_Ratio']], dataset[['Label']], test_size=test_pct, shuffle=True)
     
     if isfile('hash_vectorizer.pkl'):
         with open('hash_vectorizer.pkl', 'rb') as f:
@@ -43,14 +43,25 @@ def generate_split_data(csv_file, test_pct=0.40, head=0):
 
     X_test_vect = count_vectorizer.transform(X_test.Body.astype('U').values)
     X_test_sender_vect = hash_vectorizer.transform(X_test.Sender_Domain.apply(lambda x: np.str_(x)))
-
-    print(X_train_vect.shape, coo_matrix(X_train.Sentiment.astype(float)).T.shape, X_train_sender_vect.shape)
+    #print(X_train_vect.shape, coo_matrix(X_train.Sentiment.astype(float)).T.shape, X_train_sender_vect.shape)
 
     #concat sentiment back to data
-    transpose_train_sentiment = coo_matrix(X_train.Sentiment.astype(float)).T
-    new_X_train = hstack([X_train_vect, X_train_sender_vect, transpose_train_sentiment])
-    transpose_test_sentiment = coo_matrix(X_test.Sentiment.astype(float)).T
-    new_X_test = hstack([X_test_vect, X_test_sender_vect, transpose_test_sentiment])
+    new_X_train = hstack(
+        [
+            X_train_vect, 
+            X_train_sender_vect, 
+            coo_matrix(X_train.Sentiment.astype(float)).T, 
+            coo_matrix(X_train.Caps_Ratio.astype(float)).T
+        ]
+    )
+    new_X_test = hstack(
+        [
+            X_test_vect, 
+            X_test_sender_vect, 
+            coo_matrix(X_test.Sentiment.astype(float)).T, 
+            coo_matrix(X_test.Caps_Ratio.astype(float)).T
+        ]
+    )
 
     return new_X_train, new_X_test, y_train, y_test
 

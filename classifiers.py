@@ -37,8 +37,15 @@ def BaggingSVC(X_train, X_test, y_train):
   
 #Random Forest Classifier
 def randomForestClassifier(X_train, X_test, y_train):
+
     #n_estimators is number of trees, max_features is number of features, max_depth is max depth per tree
-    clf = RandomForestClassifier(n_estimators=100, max_features='sqrt', max_depth=40, random_state=42, class_weight='balanced')
+    clf = RandomForestClassifier(
+        n_estimators=100, 
+        max_features='sqrt', 
+        max_depth=40, 
+        random_state=42, 
+        class_weight='balanced'
+        )
     clf.fit(X_train, y_train)
 
     #dump model into pkl file for reuse
@@ -57,7 +64,7 @@ def rfcSearch(X_train, X_test, y_train):
         }
     
     #set scoring metrics
-    scoring = {'f1':'f1'}
+    scoring = {'precision':'precision', 'recall':'recall'}
 
     #Set search for random forest with set parameters
     clf = GridSearchCV(
@@ -70,7 +77,7 @@ def rfcSearch(X_train, X_test, y_train):
         param_grid=parameters, 
         n_jobs=-1, 
         scoring=scoring, 
-        refit='f1',
+        refit='precision',
         return_train_score=True,
     )
 
@@ -98,7 +105,7 @@ def rfcSearch(X_train, X_test, y_train):
 
 def plotMetrics(results, scoring):
     plt.figure(figsize=(13, 13))
-    plt.title("GridSearchCV evaluating Random Forest for Recall", fontsize=16)
+    plt.title("GridSearchCV evaluating Random Forest for Precision", fontsize=16)
 
     plt.xlabel("max_depth")
     plt.ylabel("Score")
