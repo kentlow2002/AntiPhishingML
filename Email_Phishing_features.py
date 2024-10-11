@@ -65,13 +65,10 @@ def feature_extraction(filename):
     # 5. Count misspelled words using SpellChecker
     df['Num_Misspelled_Words'] = df['Body'].apply(lambda x: count_misspelled_words(x) if pd.notna(x) else 0)
 
-    # 6. Detect if the body mentions an attachment
-    df['Has_Attachment'] = df['Body'].apply(lambda x: 'attachment' in x.lower() if pd.notna(x) else False)
-
-    # 7. Count the number of special characters in the body
+    # 6. Count the number of special characters in the body
     df['Special_Char_Count'] = df['Body'].apply(lambda x: sum(1 for char in x if not char.isalnum()) if pd.notna(x) else 0)
 
-    # 8. Perform sentiment analysis on the body using TextBlob
+    # 7. Perform sentiment analysis on the body using TextBlob
     df['Sentiment'] = df['Body'].apply(lambda x: TextBlob(x).sentiment.polarity if pd.notna(x) else 0)
 
     # Handle missing values if any
