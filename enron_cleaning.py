@@ -1,5 +1,4 @@
 import pandas as pd
-import re
 
 # Configuration
 input_file = './enron_data_fraud_labeled.csv'

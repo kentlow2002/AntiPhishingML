@@ -1,7 +1,6 @@
 import os
 import re
 import pandas as pd
-import numpy as np
 from faker import Faker  # To generate random email addresses and dates
 
 # Initialize Faker instance for generating random data
