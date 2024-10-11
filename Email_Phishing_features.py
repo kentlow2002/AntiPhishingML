@@ -51,30 +51,27 @@ def feature_extraction(filename):
     df['Typo_Domain_Flag'] = df['Sender_Domain'].apply(lambda x: is_typo_domain(x, known_legit_domains))
     df['Suspicious_Domain'] = df.apply(lambda row: row['Suspicious_Domain_Pattern'] or row['Suspicious_TLD_Flag'] or row['Typo_Domain_Flag'], axis=1)
 
-    # 2. Count the number of recipients in the 'To' field
-    df['Num_Recipients'] = df['To'].apply(lambda x: len(x.split(',')) if pd.notna(x) else 0)
-
-    # 3. Measure the length of the subject and body
+    # 2. Measure the length of the subject and body
     df['Subject_Length'] = df['Subject'].apply(lambda x: len(x) if pd.notna(x) else 0)
     df['Body_Length'] = df['Body'].apply(lambda x: len(x) if pd.notna(x) else 0)
 
-    # 4. Identify phishing-related keywords in the email body
+    # 3. Identify phishing-related keywords in the email body
     phishing_keywords = ['urgent', 'password', 'click', 'account', 'verify', 'bank', 'login']
     df['Keyword_Flag'] = df['Body'].apply(lambda x: any(keyword in x.lower() for keyword in phishing_keywords))
 
-    # 5. Calculate the ratio of capital letters in the body
+    # 4. Calculate the ratio of capital letters in the body
     df['Caps_Ratio'] = df['Body'].apply(lambda x: round(sum(1 for c in x if c.isupper()) / len(x), 5) if len(x) > 0 else 0)
 
-    # 6. Count misspelled words using SpellChecker
+    # 5. Count misspelled words using SpellChecker
     df['Num_Misspelled_Words'] = df['Body'].apply(lambda x: count_misspelled_words(x) if pd.notna(x) else 0)
 
-    # 7. Detect if the body mentions an attachment
+    # 6. Detect if the body mentions an attachment
     df['Has_Attachment'] = df['Body'].apply(lambda x: 'attachment' in x.lower() if pd.notna(x) else False)
 
-    # 8. Count the number of special characters in the body
+    # 7. Count the number of special characters in the body
     df['Special_Char_Count'] = df['Body'].apply(lambda x: sum(1 for char in x if not char.isalnum()) if pd.notna(x) else 0)
 
-    # 9. Perform sentiment analysis on the body using TextBlob
+    # 8. Perform sentiment analysis on the body using TextBlob
     df['Sentiment'] = df['Body'].apply(lambda x: TextBlob(x).sentiment.polarity if pd.notna(x) else 0)
 
     # Handle missing values if any
