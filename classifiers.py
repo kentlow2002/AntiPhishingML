@@ -1,17 +1,31 @@
 from sklearn.svm import SVC
-from sklearn.pipeline import Pipeline
-from sklearn.preprocessing import MaxAbsScaler
 from sklearn.ensemble import RandomForestClassifier, BaggingClassifier
 from sklearn.model_selection import GridSearchCV
-from sklearn.metrics import precision_recall_curve, classification_report
+from sklearn.metrics import RocCurveDisplay
 from vectorization import generate_split_data
 from pickle import dump
 import numpy as np
 import matplotlib.pyplot as plt
-import pandas as pd
 
 #Support Vector Classifier
 def supportVectorClassifier(X_train, X_test, y_train):
+    """
+    Implementation of Support Vector Classifier with Linear kernel
+
+    Parameters
+    ----------
+    X_train : sparse matrix
+        Inputs from training set
+    X_test : sparse matrix
+        Inputs from testing set
+    y_train : sparse matrix
+        Expected output for training set
+
+    Returns
+    -------
+    predictions : sparse matrix
+        Predicted output for testing set
+    """
     # C is regularization parameter >0, gamma is kernel coeff, random state control rng, tol is tolerance
     svm = SVC(C=1.0, kernel='linear', gamma=0.1, random_state=42, class_weight='balanced')
     #svm = LinearSVC(C=1.0, random_state=42)
@@ -22,6 +36,23 @@ def supportVectorClassifier(X_train, X_test, y_train):
 
 #Multiple Support Vector Classifiers in 1 'bag'
 def BaggingSVC(X_train, X_test, y_train):
+    """
+    Implementation of Bagging with Linear SVC
+
+    Parameters
+    ----------
+    X_train : sparse matrix
+        Inputs from training set
+    X_test : sparse matrix
+        Inputs from testing set
+    y_train : sparse matrix
+        Expected output for training set
+
+    Returns
+    -------
+    predictions : sparse matrix
+        Predicted output for testing set
+    """
     # C is regularization parameter >0, gamma is kernel coeff, random state control rng, tol is tolerance
     svm = SVC(C=1.0, kernel='linear', gamma=0.1, random_state=42, class_weight='balanced')
     #Put base estimator into Bagging Classifier
@@ -37,14 +68,31 @@ def BaggingSVC(X_train, X_test, y_train):
   
 #Random Forest Classifier
 def randomForestClassifier(X_train, X_test, y_train):
+    """
+    Implementation of Random Forest
+
+    Parameters
+    ----------
+    X_train : sparse matrix
+        Inputs from training set
+    X_test : sparse matrix
+        Inputs from testing set
+    y_train : sparse matrix
+        Expected output for training set
+
+    Returns
+    -------
+    predictions : sparse matrix
+        Predicted output for testing set
+    """
 
     #n_estimators is number of trees, max_features is number of features, max_depth is max depth per tree
     clf = RandomForestClassifier(
         n_estimators=100, 
         max_features='sqrt', 
-        max_depth=40, 
+        max_depth=70, 
         random_state=42, 
-        class_weight='balanced'
+        class_weight='balanced',
         )
     clf.fit(X_train, y_train)
 
@@ -58,6 +106,23 @@ def randomForestClassifier(X_train, X_test, y_train):
 
 #Random Forest Classifier with Hyperparameter Searching to tune for precision, recall etc
 def rfcSearch(X_train, X_test, y_train):
+    """
+    Implementation of Random Forest with GridSearchCV for hyperparameter searching
+
+    Parameters
+    ----------
+    X_train : sparse matrix
+        Inputs from training set
+    X_test : sparse matrix
+        Inputs from testing set
+    y_train : sparse matrix
+        Expected output for training set
+
+    Returns
+    -------
+    predictions : sparse matrix
+        Predicted output for testing set
+    """
     #set parameters to search best value for
     parameters = {
         'max_depth': list(range(10, 100, 10))
@@ -72,7 +137,7 @@ def rfcSearch(X_train, X_test, y_train):
             n_estimators=100,
             random_state=42,
             max_features='sqrt',
-            class_weight='balanced'
+            class_weight='balanced',
         ), 
         param_grid=parameters, 
         n_jobs=-1, 
@@ -83,14 +148,18 @@ def rfcSearch(X_train, X_test, y_train):
 
     #fit on training data
     clf.fit(X_train, y_train)
-    #results = clf.cv_results_
+
+    #print the best parameter values found
     print(clf.best_params_)
 
     #plot metric graph
     plotMetrics(clf.cv_results_, scoring)
 
     #make sure file name has no forbidden characters (for windows filenames)
+    #so we can tell which model had which parameter
     #pickle_name = 'randomForestClassifier'+str(clf.best_params_).replace(': ', '').replace('\'', '').replace(' ','')
+
+    #generic name for file
     pickle_name = 'model.pkl'
 
     #export model to file
@@ -98,14 +167,29 @@ def rfcSearch(X_train, X_test, y_train):
         dump(clf, f, protocol=5)
 
     #predict on test data
-    y_pred = clf.predict(X_test)
+    predictions = clf.best_estimator_.predict(X_test)
 
-    return y_pred
+    return predictions
 
 
 def plotMetrics(results, scoring):
+    """
+    Plot a graph of scores against parameters with Matplotlib
+    The graph will appear during runtime
+
+    Parameters
+    ----------
+    results : sparse matrix
+        Results from GridSearchCV hyperparameter search
+    scoring : dict
+        Dictionary of scoring metrics to plot
+
+    Returns
+    -------
+    Nothing
+    """
     plt.figure(figsize=(13, 13))
-    plt.title("GridSearchCV evaluating Random Forest for Precision", fontsize=16)
+    plt.title("GridSearchCV evaluating Random Forest for Recall", fontsize=16)
 
     plt.xlabel("max_depth")
     plt.ylabel("Score")
@@ -169,8 +253,8 @@ if __name__ == '__main__':
     #run classifier to get predictions
     predictions = rfcSearch(X_train, X_test, y_train.squeeze())
 
-    #print metrics report
-    print(classification_report(y_test, predictions))
+    #display = RocCurveDisplay.from_predictions(y_test, predictions)
+    plt.show()
     '''precision, recall, _ = precision_recall_curve(y_test, predictions)
     print(precision, recall)
     print(classification_report(y_test, predictions))'''

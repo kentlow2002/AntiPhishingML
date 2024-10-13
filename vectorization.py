@@ -8,6 +8,32 @@ from os.path import isfile
 
 # Function to load data from CSV, perform TF-IDF, and split training and testing data
 def generate_split_data(csv_file, test_pct=0.40, head=0):
+    """
+    Reads a CSV file containing the dataset, splits the dataset into training and testing, 
+    performs any vectorization required for input
+
+    Parameters
+    ----------
+    csv_file : str
+        CSV file to read
+    test_pct : float
+        Percentage of the dataset to put into testing
+    head : int
+        Read first N rows of the dataset.
+        Used for testing the function only.
+        Set to 0 to read whole dataset.
+
+    Returns
+    -------
+    new_X_train : sparse matrix
+        Inputs for training set
+    new_X_test : sparse matrix
+        Inputs for testing set
+    y_train : sparse matrix
+        Expected output for training set
+    y_test : sparse matrix
+        Expected output for testing set
+    """
 
     #read data from csv. if head is > 0, read the first (head) addresses, else read the whole file
     if head == 0:
@@ -46,6 +72,9 @@ def generate_split_data(csv_file, test_pct=0.40, head=0):
     #print(X_train_vect.shape, coo_matrix(X_train.Sentiment.astype(float)).T.shape, X_train_sender_vect.shape)
 
     #concat sentiment back to data
+    #for sentiment and caps ratio, they are column vectors with shape (1,)
+    #creating a new matrix and transposing is a trick to turn a column vector
+    #into a 2d array
     new_X_train = hstack(
         [
             X_train_vect, 
